@@ -6,6 +6,9 @@
 //  Copyright © 2016 Moonshot Labs. All rights reserved.
 //
 
+// This project draws on Apple's SFSpeechRecognizer sample project
+// https://developer.apple.com/library/prerelease/content/samplecode/SpeakToMe/Introduction/Intro.html
+
 import UIKit
 
 @UIApplicationMain

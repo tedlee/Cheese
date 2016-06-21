@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Your microphone will be used to take a photo</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
@@ -30,6 +32,8 @@
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>We use speech recognition to figure out when you say &quot;Cheese&quot; and trigger the camera</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
