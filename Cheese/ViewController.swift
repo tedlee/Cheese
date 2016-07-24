@@ -8,6 +8,7 @@
 
 import UIKit
 import Speech
+import AVFoundation
 
 public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
 
@@ -15,10 +16,13 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private let audioEngine = AVAudioEngine()
     private var recognitionTask: SFSpeechRecognitionTask?
+    private var captureSession: AVCaptureSession?
+    private var previewLayer: AVCaptureVideoPreviewLayer?
+    private var stillImageOutput: AVCapturePhotoOutput?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
+        startCamera()
     }
     
     override public func viewDidAppear(_ animated: Bool) {
@@ -98,6 +102,36 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
         try audioEngine.start()
     }
     
+    private func startCamera() {
+        captureSession = AVCaptureSession()
+        captureSession!.sessionPreset = AVCaptureSessionPresetPhoto
+        
+        let backCamera = AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo)
+        
+        do {
+            let input = try AVCaptureDeviceInput(device: backCamera)
+            captureSession!.addInput(input)
+            
+            stillImageOutput = AVCapturePhotoOutput()
+            captureSession!.addOutput(stillImageOutput)
+            
+            if let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession) {
+                previewLayer.bounds = view.bounds
+                previewLayer.position = CGPoint(x: view.bounds.midX, y: view.bounds.midY)
+                previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+                let cameraPreview = UIView(frame: CGRect(x:0.0, y:0.0, width:view.bounds.size.width, height:view.bounds.size.height))
+                cameraPreview.layer.addSublayer(previewLayer)
+                //cameraPreview.addGestureRecognizer(UITapGestureRecognizer(target: self, action:"saveToCamera:"))
+                view.addSubview(cameraPreview)
+            }
+            
+        } catch let error as NSError {
+            print(error)
+        }
+        
+    captureSession?.startRunning()
 
+    }
+    
 }
 
