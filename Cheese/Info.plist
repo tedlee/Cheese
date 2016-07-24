@@ -36,6 +36,8 @@
 	</array>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>We use speech recognition to figure out when you say &quot;Cheese&quot; and trigger the camera</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We&apos;ll need to be able to access your photo library to save the photo</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

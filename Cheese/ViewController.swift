@@ -10,7 +10,7 @@ import UIKit
 import Speech
 import AVFoundation
 
-public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
+public class ViewController: UIViewController, SFSpeechRecognizerDelegate, AVCapturePhotoCaptureDelegate {
 
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(localeIdentifier: "en-US"))!
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -19,6 +19,7 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
     private var captureSession: AVCaptureSession?
     private var previewLayer: AVCaptureVideoPreviewLayer?
     private var stillImageOutput: AVCapturePhotoOutput?
+    private var capturedImage: UIImage?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,6 +74,12 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
             
             if let result = result {
                 print(result.bestTranscription.formattedString)
+                
+                // Check if "cheese" phrase is mentioned
+                if (result.bestTranscription.segments.last?.substring.lowercased() == "cheese") {
+                    self.saveToCamera()
+                }
+                
                 isFinal = result.isFinal
             }
             
@@ -121,7 +128,7 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
                 previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
                 let cameraPreview = UIView(frame: CGRect(x:0.0, y:0.0, width:view.bounds.size.width, height:view.bounds.size.height))
                 cameraPreview.layer.addSublayer(previewLayer)
-                //cameraPreview.addGestureRecognizer(UITapGestureRecognizer(target: self, action:"saveToCamera:"))
+                cameraPreview.addGestureRecognizer(UITapGestureRecognizer(target: self, action:"saveToCamera:"))
                 view.addSubview(cameraPreview)
             }
             
@@ -133,5 +140,33 @@ public class ViewController: UIViewController, SFSpeechRecognizerDelegate {
 
     }
     
+    private func saveToCamera() {
+        guard let connection = stillImageOutput?.connection(withMediaType: AVMediaTypeVideo) else { return }
+        connection.videoOrientation = .portrait
+        
+        let settings = AVCapturePhotoSettings()
+        let previewPixelType = settings.availablePreviewPhotoPixelFormatTypes.first!
+        let previewFormat = [kCVPixelBufferPixelFormatTypeKey as String: previewPixelType,
+                             kCVPixelBufferWidthKey as String: 160,
+                             kCVPixelBufferHeightKey as String: 160,
+                             ]
+        settings.previewPhotoFormat = previewFormat
+        
+        stillImageOutput?.capturePhoto(with: settings, delegate: self)
+    }
+    
+    public func capture(_ captureOutput: AVCapturePhotoOutput, didFinishProcessingPhotoSampleBuffer photoSampleBuffer: CMSampleBuffer?, previewPhotoSampleBuffer: CMSampleBuffer?, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings?, error: NSError?) {
+        
+        let data = AVCapturePhotoOutput.jpegPhotoDataRepresentation(forJPEGSampleBuffer: photoSampleBuffer!, previewPhotoSampleBuffer: previewPhotoSampleBuffer)
+        
+        if let data = data {
+            self.capturedImage = UIImage(data: data)
+            
+            UIImageWriteToSavedPhotosAlbum(self.capturedImage!, self,nil, nil)
+        }
+    }
+    
 }
+    
+
 
